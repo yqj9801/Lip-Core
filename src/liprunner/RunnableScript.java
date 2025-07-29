@@ -15,8 +15,28 @@ protected SingleLineScript(String s) {
 this.script=s;
 }
 public void run(Operations o) {
-String str=script;
+String str=new String(script);
 str=Strings.trim(str);
+if(str.startsWith("delete")) {
+str=str.substring(6,str.length()-1);
+Map<String,Object> args=o.getValues();
+if(args.containsKey(str))args.remove(str);
+o.setValues(args);
+}
+if(str.startsWith("invoke")) {
+str=str.substring(7,str.length()-2);
+List<Object> args=new ArrayList<>();
+String methodname=new String();
+String[] invokeargs=Strings.split(str,",");
+for(int i=0;i<invokeargs.length;i++) {
+if(i>0) {
+args.add(Strings.calc(invokeargs[i],Strings.prepareCalc(str,o.getValues(),o)));
+}else {
+methodname=(String)Strings.calc(invokeargs[i],Strings.prepareCalc(str,o.getValues(),o));
+}
+}
+o.invoke(methodname,args.toArray());
+}
 if(str.startsWith("new")) {
 str=str.substring(3,str.length()-1);
 if(str.startsWith("int")) {
@@ -114,12 +134,11 @@ public Map<String, Object> getValues() {
 return args;
 }
 public void setValues(Map<String, Object> values) {
+o.setValues(values);
 args=values;
-Collections.print(values,System.out);
 }
 public void putValue(String key, Object value) {
 args.put(key,value);
-System.out.println(key+";"+value.getClass()+";"+value);
 }
 };
 if(this.script_type==ScriptBlockType.SCRIPT||(this.script_type==ScriptBlockType.IF&&(Boolean)Strings.calc(bool,Strings.prepareCalc(bool,args,o2))==true)) {
