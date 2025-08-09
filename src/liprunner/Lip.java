@@ -31,7 +31,10 @@ args.put(key,value);
 }
 public static Exception run(String script,MethodInfo[] methods) {
 try {
-RunnableScript.getScript(script).run(new LipOperation(methods));
+MethodInfo[] tmp=new MethodInfo[methods.length+BasicMethods.basicmethods.length];
+System.arraycopy(methods,0,tmp,0,methods.length);
+System.arraycopy(BasicMethods.basicmethods,0,tmp,methods.length,BasicMethods.basicmethods.length);
+RunnableScript.getScript(script).run(new LipOperation(tmp));
 return null;
 }catch(Exception e) {
 return e;
